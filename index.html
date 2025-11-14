@@ -348,11 +348,9 @@
 		<p class="summon-line">동성회가 장악한 구역을 돌파해, 바니쉬에 합류하라.</p>
 		<div class="cta-group">
 			<button class="cta-button" id="summonButton">바니쉬 채널 접속</button>
-			<button class="cta-button secondary" id="githubButton">깃허브 위상 열람</button>
 			<div class="status-bar">
 				<span><span class="status-dot"></span>Vanish Sync: <strong id="recruitCount">089</strong></span>
 				<span><span class="status-dot"></span>Counter Ready: <strong id="pulseStatus">ONLINE</strong></span>
-				<span><span class="status-dot"></span>GitHub Sync: <strong id="repoStatus">SYNCING...</strong></span>
 			</div>
 		</div>
 		<div class="chant" id="chantRing">
@@ -427,17 +425,13 @@
 		const scrambleChars = ['#', '%', '&', '*', '?', '/', '!', '+', '='];
 		const summonLine = document.querySelector('.summon-line');
 		const summonButton = document.getElementById('summonButton');
-		const githubButton = document.getElementById('githubButton');
 		const recruitCount = document.getElementById('recruitCount');
 		const pulseStatus = document.getElementById('pulseStatus');
 		const chantRing = document.getElementById('chantRing');
 		const chantText = document.getElementById('chantText');
-		const repoStatus = document.getElementById('repoStatus');
 		let phraseIndex = 0;
 		let chantIndex = 0;
 		let scrambleTimer;
-		const githubRepoUrl = 'https://github.com/rhaop1/Vanish';
-		const githubApiUrl = 'https://api.github.com/repos/rhaop1/Vanish';
 
 		function cyclePhrase() {
 			phraseIndex = (phraseIndex + 1) % phrases.length;
@@ -511,36 +505,10 @@
 			window.open(discordInvite, '_blank', 'noopener');
 		});
 
-		githubButton.addEventListener('click', () => {
-			window.open(githubRepoUrl, '_blank', 'noopener');
-		});
-
-		async function syncRepo() {
-			try {
-				repoStatus.textContent = 'SYNCING...';
-				const response = await fetch(githubApiUrl, {
-					headers: { Accept: 'application/vnd.github+json' }
-				});
-				if (!response.ok) {
-					throw new Error('Failed to reach GitHub');
-				}
-				const data = await response.json();
-				const stars = Number.isFinite(data.stargazers_count) ? data.stargazers_count : 0;
-				const forks = Number.isFinite(data.forks_count) ? data.forks_count : 0;
-				const pushed = data.pushed_at ? new Date(data.pushed_at) : null;
-				const formatted = pushed ? new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(pushed) : 'N/A';
-				repoStatus.textContent = `★${stars} · Fork ${forks} · ${formatted}`;
-			} catch (error) {
-				repoStatus.textContent = 'OFFLINE';
-			}
-		}
-
 		setInterval(cyclePhrase, 6200);
 		setInterval(rotateChant, 4200);
-		setInterval(syncRepo, 180000);
 		setChant(chantPhrases[0]);
 		scrambleTo(phrases[0]);
-		syncRepo();
 
 		const starCanvas = document.getElementById('stars');
 		const ctx = starCanvas.getContext('2d');
