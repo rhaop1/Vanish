@@ -211,67 +211,39 @@
 		}
 
 		.chant {
-			position: relative;
-			width: min(620px, 88vw);
-			min-height: 110px;
-			padding: 1.2rem 1.6rem;
-			border-radius: 18px;
-			border: 1px solid rgba(72, 72, 78, 0.5);
-			background: linear-gradient(135deg, rgba(26, 26, 28, 0.8), rgba(16, 16, 18, 0.85));
-			backdrop-filter: blur(6px);
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			color: rgba(209, 209, 213, 0.88);
-			letter-spacing: 0.16em;
-			text-align: center;
+			position: fixed;
+			inset: 0;
+			pointer-events: none;
 			overflow: hidden;
-			animation: chantGlow 4.6s ease-in-out infinite alternate;
-		}
-
-		.chant::before {
-			content: '';
-			position: absolute;
-			inset: -45% -35%;
-			background: radial-gradient(circle, rgba(32, 32, 32, 0.35) 0%, transparent 65%);
-			filter: blur(14px);
-			animation: chantAura 7s linear infinite;
-			z-index: 0;
+			z-index: 2;
 		}
 
 		.chant-line {
-			position: relative;
+			position: absolute;
+			bottom: -12vh;
+			transform: translateX(-50%);
 			display: inline-block;
-			padding: 0.35rem 0.75rem;
+			max-width: 60vw;
+			padding: 0.4rem 0.9rem;
 			border-radius: 24px;
-			border: 1px solid rgba(76, 76, 82, 0.6);
-			background: rgba(24, 24, 26, 0.9);
+			border: 1px solid rgba(76, 76, 82, 0.45);
+			background: rgba(18, 18, 20, 0.86);
 			backdrop-filter: blur(6px);
 			font-size: clamp(0.76rem, 2.4vw, 1.05rem);
+			letter-spacing: 0.16em;
 			text-transform: none;
-			transform: translateY(60%);
+			text-align: center;
+			color: rgba(209, 209, 213, 0.9);
+			animation: chantFloat var(--chant-duration, 9s) linear forwards;
+			white-space: normal;
 			opacity: 0;
-			z-index: 1;
 		}
 
-		.chant-line.rise {
-			animation: chantRise 1.05s ease forwards;
-		}
-
-		@keyframes chantGlow {
-			0% { box-shadow: 0 0 18px rgba(8, 8, 8, 0.6); }
-			100% { box-shadow: 0 0 28px rgba(18, 18, 18, 0.8); }
-		}
-
-		@keyframes chantAura {
-			from { transform: rotate(0deg) scale(1.1); opacity: 0.5; }
-			to { transform: rotate(360deg) scale(1.2); opacity: 0.25; }
-		}
-
-		@keyframes chantRise {
-			from { transform: translateY(60%); opacity: 0; }
-			60% { opacity: 1; }
-			to { transform: translateY(0); opacity: 1; }
+		@keyframes chantFloat {
+			0% { transform: translate(-50%, 0); opacity: 0; }
+			10% { opacity: 0.9; }
+			90% { opacity: 0.85; }
+			100% { transform: translate(-50%, -120vh); opacity: 0; }
 		}
 
 		.floating-sigil {
@@ -353,9 +325,7 @@
 				<span><span class="status-dot"></span>Counter Ready: <strong id="pulseStatus">ONLINE</strong></span>
 			</div>
 		</div>
-		<div class="chant" id="chantRing">
-			<span id="chantText" class="chant-line"></span>
-		</div>
+		<div class="chant" id="chantRing"></div>
 		<div class="floating-sigil"></div>
 	</main>
 
@@ -428,7 +398,6 @@
 		const recruitCount = document.getElementById('recruitCount');
 		const pulseStatus = document.getElementById('pulseStatus');
 		const chantRing = document.getElementById('chantRing');
-		const chantText = document.getElementById('chantText');
 		let phraseIndex = 0;
 		let chantIndex = 0;
 		let scrambleTimer;
@@ -462,10 +431,17 @@
 		}
 
 		function setChant(message) {
-			chantText.textContent = message;
-			chantText.classList.remove('rise');
-			void chantText.offsetWidth;
-			chantText.classList.add('rise');
+			const line = document.createElement('span');
+			line.className = 'chant-line';
+			line.textContent = message;
+			const leftPercent = Math.random() * 80 + 10;
+			line.style.left = `${leftPercent}%`;
+			const duration = (Math.random() * 3 + 5.5).toFixed(1);
+			line.style.setProperty('--chant-duration', `${duration}s`);
+			chantRing.appendChild(line);
+			line.addEventListener('animationend', () => {
+				line.remove();
+			});
 		}
 
 		function rotateChant() {
@@ -506,7 +482,7 @@
 		});
 
 		setInterval(cyclePhrase, 6200);
-		setInterval(rotateChant, 4200);
+		setInterval(rotateChant, 2800);
 		setChant(chantPhrases[0]);
 		scrambleTo(phrases[0]);
 
