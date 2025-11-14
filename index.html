@@ -436,7 +436,7 @@
 			line.textContent = message;
 			const leftPercent = Math.random() * 80 + 10;
 			line.style.left = `${leftPercent}%`;
-			const duration = (Math.random() * 3 + 5.5).toFixed(1);
+			const duration = (Math.random() * 2 + 3.5).toFixed(1);
 			line.style.setProperty('--chant-duration', `${duration}s`);
 			chantRing.appendChild(line);
 			line.addEventListener('animationend', () => {
